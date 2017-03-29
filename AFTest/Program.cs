@@ -22,7 +22,8 @@ namespace AFTest
             }
         }
 
-        private const int FocusIteration = 6;
+        private const int FocusIteration = 5;
+        private const int FocusPointSize = 3;
 
         static void Main(string[] args)
         {
@@ -37,11 +38,15 @@ namespace AFTest
                                   .ToArray();
 
             stopwatch.Stop();
-            Console.WriteLine($"{stopwatch.Elapsed} elapsed while reading files");
+            Console.WriteLine($"{stopwatch.Elapsed} elapsed while reading files.");
+            Console.WriteLine();
 
             var focusPoints = Program.GenerateFocusPoints();
 
-            Console.WriteLine($"Using {FocusIteration} iterations, totally {focusPoints.Length} focus points for contrast detection");
+            Console.WriteLine($"Using {FocusIteration} iterations, totally {focusPoints.Length} focus points for contrast detection.");
+            Console.WriteLine($"Focus point size is {FocusPointSize} ({FocusPointSize * 2 + 1} * {FocusPointSize * 2 + 1} pixels.)");
+
+            Console.Out.Flush();
 
             stopwatch.Reset();
             stopwatch.Start();
@@ -53,13 +58,15 @@ namespace AFTest
                                  })
                                  .OrderByDescending(c => c.Measurement);
 
-            Console.WriteLine($"{"File",-20}{"Measurement",10}");
-            Console.WriteLine(new string('-', 30));
+            Console.WriteLine();
+            Console.WriteLine($"{"File",-20}{"Measurement",14}");
+            Console.WriteLine(new string('-', 34));
             foreach (var contrast in contrasts)
             {
-                Console.WriteLine($"{Path.GetFileName(contrast.File),-20}{contrast.Measurement,10}");
+                Console.WriteLine($"{Path.GetFileName(contrast.File),-20}{contrast.Measurement,14}");
             }
 
+            Console.WriteLine();
             stopwatch.Stop();
             Console.WriteLine($"{stopwatch.Elapsed} elapsed detecting contrast");
 
@@ -95,9 +102,9 @@ namespace AFTest
         {
             var center = image.GetPixel(x, y).ToArgb();
             var measurement = 0L;
-            for (var xOffset = -1; xOffset <= 1; ++xOffset)
+            for (var xOffset = -FocusPointSize; xOffset <= FocusPointSize; ++xOffset)
             {
-                for (var yOffset = -1; yOffset <= 1; ++yOffset)
+                for (var yOffset = -FocusPointSize; yOffset <= FocusPointSize; ++yOffset)
                 {
                     measurement += Math.Abs(center - image.GetPixel(x + xOffset, y + yOffset).ToArgb());
                 }
